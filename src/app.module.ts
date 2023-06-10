@@ -4,6 +4,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { UserModule } from './user/user.module';
 
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { PrismaModule } from './prisma/prisma.module';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
     UserModule,
+    PrismaModule,
+    PostModule,
   ],
 })
 export class AppModule {}
