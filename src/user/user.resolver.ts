@@ -1,4 +1,4 @@
-import { Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserSchema } from './user.schema';
 @Resolver(() => UserSchema)
 export class UserResolver {
@@ -20,4 +20,7 @@ export class UserResolver {
       age: 20,
     };
   }
+
+  // @Mutation(() => String)
+  // createUser(@Args("data") data:) {}
 }

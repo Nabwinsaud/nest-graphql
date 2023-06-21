@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { PrismaModule } from './prisma/prisma.module';
 import { PostModule } from './post/post.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,10 +15,15 @@ import { PostModule } from './post/post.module';
       playground: false,
       autoSchemaFile: true, // if it works dont' touch it
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      formatError: (err: any) => {
+        const { originalError, ...rest } = err.extensions;
+        return originalError;
+      },
     }),
     UserModule,
     PrismaModule,
     PostModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
