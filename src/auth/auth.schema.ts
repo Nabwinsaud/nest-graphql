@@ -28,3 +28,9 @@ export class UserSignupSchema {
   @Field(() => [PostSchema], { nullable: true })
   post: PostSchema;
 }
+
+@ObjectType()
+export class AuthToken {
+  @Field(() => String, { nullable: true })
+  accessToken: string;
+}

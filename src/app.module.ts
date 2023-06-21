@@ -15,9 +15,13 @@ import { AuthModule } from './auth/auth.module';
       playground: false,
       autoSchemaFile: true, // if it works dont' touch it
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
-      formatError: (err: any) => {
-        const { originalError, ...rest } = err.extensions;
-        return originalError;
+      formatError: (err) => {
+        const { originalError } = err.extensions;
+
+        return {
+          message: err.message,
+          originalError,
+        };
       },
     }),
     UserModule,

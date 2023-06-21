@@ -23,3 +23,17 @@ export class AuthInput {
   @IsStrongPassword()
   password: string;
 }
+
+@InputType()
+export class LoginInput {
+  @Field()
+  @IsString()
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+  @Field()
+  @IsString()
+  @IsNotEmpty()
+  @IsStrongPassword()
+  password: string;
+}

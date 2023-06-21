@@ -1,37 +1,48 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { AccessToken } from './interface.auth';
-import { UsersService } from 'src/user/user.service';
 import { AuthInput } from './auth.validator';
+import { Prisma } from '@prisma/client';
+import bcrypt from 'bcrypt';
+const saltOrRounds = 10;
 @Injectable()
 export class AuthService {
   constructor(
-    // private jwtService: JwtService,
-    private readonly prisma: PrismaService, // private readonly user: UsersService,
-    private readonly user: UsersService,
+    private readonly prisma: PrismaService,
+    private jwtService: JwtService,
   ) {}
 
   async signUp(data: AuthInput) {
-    const user = await this.prisma.user.create({
-      data,
-    });
-    return user;
+    try {
+      const hashPassword = await bcrypt.hash(data.password, saltOrRounds);
 
-    // const payload = { id: data.id, email: data.email };
-
-    // const token = this.jwtService.sign(payload);
-    // return {
-    //   accessToken: token,
-    // };
+      const user = await this.prisma.user.create({
+        data: { ...data, password: hashPassword },
+      });
+      return user;
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2002') {
+          throw new Error(`user named ${data.email} already exists`);
+        }
+      }
+      throw new Error(e);
+    }
   }
 
-  async signIn(username: string, pass: string): Promise<any> {
-    const user = await this.user.findOne(username);
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
+  async signIn(email: string, pass: string): Promise<{ accessToken: string }> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    const isMatch = await bcrypt.compare(pass, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException('Invalid credentials');
     }
-    const { password, ...result } = user;
-    return result;
+    const payload = { id: user.id, email: user.email };
+    const token = await this.jwtService.signAsync(payload, {
+      secret: 'random',
+      expiresIn: '1d',
+    });
+    return {
+      accessToken: token,
+    };
   }
 }
