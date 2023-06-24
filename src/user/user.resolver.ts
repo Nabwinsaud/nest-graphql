@@ -1,5 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserSchema } from './user.schema';
+import { Roles } from 'src/enum';
+import { HasRoles } from 'src/auth/roles.decorator';
 @Resolver(() => UserSchema)
 export class UserResolver {
   @Query(() => String)
@@ -12,6 +14,8 @@ export class UserResolver {
     return 'Hello world typescript';
   }
 
+  @HasRoles([Roles.ADMIN])
+  // @UseGuards(AuthGu)
   @Query(() => UserSchema)
   getUserSchema(): UserSchema {
     return {

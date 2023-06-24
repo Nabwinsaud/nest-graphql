@@ -1,8 +1,10 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { AuthToken, UserSignupSchema } from './auth.schema';
 import { AuthInput, LoginInput } from './auth.validator';
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { AuthGuard } from './guard/auth.guard';
+import { User } from '@prisma/client';
 
 @Resolver()
 export class AuthResolver {
@@ -16,9 +18,12 @@ export class AuthResolver {
 
   @UsePipes(ValidationPipe)
   @Mutation(() => AuthToken)
+  // @UseGuards(AuthGuard)
   async login(
     @Args('data') data: LoginInput,
+    @Context('user') user: User,
   ): Promise<{ accessToken: string }> {
+    console.log('user is', user);
     return await this.authService.signIn(data.email, data.password);
   }
 }

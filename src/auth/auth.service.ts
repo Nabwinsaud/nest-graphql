@@ -31,12 +31,13 @@ export class AuthService {
   }
 
   async signIn(email: string, pass: string): Promise<{ accessToken: string }> {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    console.log('user is', email);
+    const user = await this.prisma.user.findUnique({ where: { email: email } });
     const isMatch = await bcrypt.compare(pass, user.password);
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = { id: user.id, email: user.email };
+    const payload = { id: user.id, email: user.email, role: user.role };
     const token = await this.jwtService.signAsync(payload, {
       secret: 'random',
       expiresIn: '1d',

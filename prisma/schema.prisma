@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["jsonProtocol"]
 }
 
 datasource db {
@@ -16,6 +17,7 @@ model User {
   password String
   email    String @unique
   posts    Post[]
+  role     Roles  @default(USER)
 }
 
 model Post {
@@ -26,4 +28,9 @@ model Post {
   userId      String?
 
   @@index([userId, title])
+}
+
+enum Roles {
+  ADMIN
+  USER
 }
